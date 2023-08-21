@@ -24,23 +24,26 @@ public class KulaGenerator : MonoBehaviour
 
     void GenerateObjects()
     {
-        for(int i = 0; i < objectCount; i++)
+        //Used to space the points uniformly
+        float goldenRatio = (1.0f + Mathf.Sqrt(5.0f)) / 2.0f;
+
+        for (int i = 0; i < objectCount; i++)
         {
-            //Calculate the angle to make distance between objects equal
-            float angle = i * (360f / objectCount);
-            
-            //Convert angles to radiants
-            float radiants = angle * Mathf.Deg2Rad;
+            //Distribute along y-axis
+            float y = 1.0f - ((float)i / (objectCount - 1)) * 2.0f;
+            float radiusAtY = Mathf.Sqrt(1.0f - y * y);
+            float theta = 2.0f * Mathf.PI * goldenRatio * i;
 
-            //Setting the spawn position
-            Vector3 spawnPosition = transform.position + new Vector3(Mathf.Cos(radiants) * radius, 0f, Mathf.Sin(radiants) * radius);
+            //Convert to the Cartesian coordinates
+            float x = Mathf.Cos(theta) * radiusAtY * radius;
+            float z = Mathf.Sin(theta) * radiusAtY * radius;
 
-            //Spawning the object on the radious of the circle as a child.
-            var newObject = Instantiate(generatedObject, spawnPosition, Quaternion.identity);
-            newObject.transform.parent = gameObject.transform;
-
-            //Testing
-            //Debug.Log(angle);
+            //Set the spawn position
+            Vector3 spawnPosition = new Vector3(x, y * radius, z) + transform.position;
+            //Spawn the object in the position
+            GameObject spawnedObject = Instantiate(generatedObject, spawnPosition, Quaternion.identity);
+            //Set parent
+            spawnedObject.transform.parent = transform;
         }
     }
 
@@ -55,5 +58,4 @@ public class KulaGenerator : MonoBehaviour
             yield return null;
         }
     }
-
 }
